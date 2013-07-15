@@ -447,11 +447,11 @@ public class TransferViewController : UIViewController
 
 			transferContext.TransferAccomplished += (c,details) => 
 			{
-				Console.WriteLine("Transfer accomplished");
+				new UIAlertView("Transferred", details.Value.Log, null, "OK", null).Show();
 			};
 			transferContext.TransferFailed += (c,reason) => 
 			{
-				Console.WriteLine("Transfer failed");
+				new UIAlertView("Failed", reason.Value.Reason, null, "OK", null).Show();
 			};
 
 			//Not shown: Wrap in transaction
