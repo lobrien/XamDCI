@@ -83,12 +83,34 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="Model\" />
+    <Folder Include="Model\Roles\" />
+    <Folder Include="View\" />
+    <Folder Include="Controller\" />
+    <Folder Include="Model\Data\" />
+    <Folder Include="Model\Contexts\" />
+    <Folder Include="Model\Classes\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
+    <None Include="Model\Readme.MD" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
+    <Compile Include="Model\Roles\TransferSource.cs" />
+    <Compile Include="Model\Roles\TransferSink.cs" />
+    <Compile Include="View\AccountPickerViewModel.cs" />
+    <Compile Include="View\TransferView.cs" />
+    <Compile Include="Controller\TransferViewController.cs" />
+    <Compile Include="Model\Data\Account.cs" />
+    <Compile Include="Model\Data\BankMembership.cs" />
+    <Compile Include="Model\Contexts\TransferContext.cs" />
+    <Compile Include="Model\Contexts\TransferContextTrait.cs" />
+    <Compile Include="Model\Classes\TArgs.cs" />
+    <Compile Include="Model\Classes\TransferDetails.cs" />
+    <Compile Include="Model\Classes\TransferFailedReason.cs" />
+    <Compile Include="View\ATMView.cs" />
+    <Compile Include="Controller\ATMController.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
