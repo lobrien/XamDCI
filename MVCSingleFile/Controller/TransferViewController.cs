@@ -1,5 +1,6 @@
 using System;
 using MonoTouch.UIKit;
+using System.Drawing;
 
 namespace DCISingleFile
 {
@@ -57,6 +58,19 @@ namespace DCISingleFile
 				//Not shown: Wrap in transaction
 				transferContext.Run();
 			};
+
+
+		}
+
+
+		public override void ViewDidAppear(bool animated)
+		{
+			View.Frame = new RectangleF(0, 0, UIScreen.MainScreen.Bounds.Width * 3, UIScreen.MainScreen.Bounds.Height);
+			
+			//Make initial request
+			//Make initial service request
+			Model.ListTransferSources();
+
 		}
 
 		private void Validate(bool condition)

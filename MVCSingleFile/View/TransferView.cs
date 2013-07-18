@@ -6,80 +6,35 @@ namespace DCISingleFile
 {
 	public class TransferSpecificationView : UIView
 	{
+		UIButton transferButton;
+		UIButton cancelButton;
+		UIPickerView sourcePicker;
+		UIPickerView sinkPicker;
+		UITextField amountBox;
+
+		private SizeF componentSize;
+		private float labelHeight;
+		private float pickerHeight;
+		private float compY;
+		private float screenWidth;
+
 		public TransferSpecificationView(RectangleF frame, BankMembership model) : base(frame)
 		{
 			BackgroundColor = UIColor.White;
 
-			var componentWidth = UIScreen.MainScreen.Bounds.Width - 20;
-			var labelHeight = 44;
-			var pickerHeight = 162;
-			var compY = labelHeight + 20;
+			labelHeight = 44;
+			componentSize = new SizeF(UIScreen.MainScreen.Bounds.Width - 20, labelHeight + 20);
 
-			var transferLabel = new UILabel(new RectangleF(10, 10, componentWidth, labelHeight));
-			transferLabel.Font = UIFont.SystemFontOfSize(30);
-			transferLabel.Text = "Transfer Funds";
+			pickerHeight = 162;
+			compY = labelHeight + 20;
+			screenWidth = UIScreen.MainScreen.Bounds.Width;
 
-			var pickerLabelFrame = new RectangleF(10, compY, componentWidth, labelHeight);
-			var pickerLabelOffscreenRight = new RectangleF(UIScreen.MainScreen.Bounds.Width, compY, componentWidth, labelHeight);
-			var pickerLabelOffscreenLeft = new RectangleF(-UIScreen.MainScreen.Bounds.Width, compY, componentWidth, labelHeight);
+			var pageView = new UIView(new RectangleF(0, 0, UIScreen.MainScreen.Bounds.Width * 3, UIScreen.MainScreen.Bounds.Height));
+			Add(pageView);
 
-			var pickerFrame = new RectangleF(10, 2 * compY, componentWidth, pickerHeight);
-			var pickerFrameOffscreenRight = new RectangleF(UIScreen.MainScreen.Bounds.Width, 2 * compY, componentWidth, pickerHeight);
-			var pickerFrameOffscreenLeft = new RectangleF(-UIScreen.MainScreen.Bounds.Width, 2 * compY, componentWidth, pickerHeight);
-
-			var sourcePickerLabel = new UILabel(pickerLabelFrame);
-			sourcePickerLabel.Font = UIFont.SystemFontOfSize(18);
-			sourcePickerLabel.Text = "Choose Source Account";
-
-			var sourcePicker = new UIPickerView(pickerFrame);
-			sourcePicker.Hidden = true;
-
-			var sinkPickerLabel = new UILabel(pickerLabelOffscreenRight);
-			sinkPickerLabel.Font = UIFont.SystemFontOfSize(18);
-			sinkPickerLabel.Text = "Choose Destination Account";
-			var sinkPicker = new UIPickerView(pickerFrameOffscreenRight);
-
-			var amountLabelFrameOffscreenRight = new RectangleF(UIScreen.MainScreen.Bounds.Width, compY, componentWidth, labelHeight);
-			var amountLabel = new UILabel(amountLabelFrameOffscreenRight);
-			amountLabel.Font = UIFont.SystemFontOfSize(18);
-			amountLabel.Text = "Enter amount to transfer";
-			var amountBoxFrameOffscreenRight = new RectangleF(UIScreen.MainScreen.Bounds.Width, 2 * compY, componentWidth, labelHeight);
-			var amountBoxFrame = new RectangleF(10, 2 * compY, componentWidth, labelHeight);
-			var amountBox = new UITextField(amountBoxFrameOffscreenRight);
-			amountBox.BorderStyle = UITextBorderStyle.RoundedRect;
-			amountBox.Font = UIFont.SystemFontOfSize(15);
-			amountBox.Placeholder = "Enter amount to transfer";
-			amountBox.Text = "20";
-			amountBox.AutocorrectionType = UITextAutocorrectionType.No;
-			amountBox.KeyboardType = UIKeyboardType.DecimalPad;
-			amountBox.ReturnKeyType = UIReturnKeyType.Done;
-			amountBox.ClearButtonMode = UITextFieldViewMode.WhileEditing;
-			amountBox.VerticalAlignment = UIControlContentVerticalAlignment.Center;
-
-			var transferButtonFrameOffscreenRight = new RectangleF(UIScreen.MainScreen.Bounds.Width, 3 * compY, componentWidth, labelHeight);
-			var transferButtonFrame = new RectangleF(10, 3 * compY, componentWidth, labelHeight);
-
-			var cancelButtonFrameOffscreenRight = new RectangleF(UIScreen.MainScreen.Bounds.Width, 4 * compY, componentWidth, labelHeight);
-			var cancelButtonFrame = new RectangleF(10, 4 * compY, componentWidth, labelHeight);
-
-
-			var transferButton = UIButton.FromType(UIButtonType.RoundedRect);
-			transferButton.Frame = transferButtonFrameOffscreenRight;
-			transferButton.SetTitle("Transfer", UIControlState.Normal);
-
-			var cancelButton = UIButton.FromType(UIButtonType.RoundedRect);
-			cancelButton.Frame = cancelButtonFrameOffscreenRight;
-			cancelButton.SetTitle("Cancel", UIControlState.Normal);
-
-			AddSubview(transferLabel);
-			AddSubview(sourcePickerLabel);
-			AddSubview(sourcePicker);
-			AddSubview(sinkPickerLabel);
-			AddSubview(sinkPicker);
-			AddSubview(amountLabel);
-			AddSubview(amountBox);
-			AddSubview(transferButton);
-			AddSubview(cancelButton);
+			LayoutSourceScreen(pageView);
+			LayoutSinkScreen(pageView);
+			LayoutAmountScreen(pageView);
 
 			//Configure reaction to view events
 			transferButton.TouchUpInside += (s, e) => 
@@ -104,35 +59,96 @@ namespace DCISingleFile
 			model.TransferSinksUpdated += (s,e) =>
 			{
 				UIView.Animate(0.5, () => {
-					sourcePickerLabel.Frame = pickerLabelOffscreenLeft;
-					sourcePicker.Frame = pickerFrameOffscreenLeft;
-
-					sinkPickerLabel.Frame = pickerLabelFrame;
-					sinkPicker.Frame = pickerFrame;
+					pageView.Frame = new RectangleF(-UIScreen.MainScreen.Bounds.Width, 0, UIScreen.MainScreen.Bounds.Width * 3, UIScreen.MainScreen.Bounds.Height);
 				});
 
 				var pickerViewModel = new AccountPickerViewModel(e.Value);
 				sinkPicker.Model = pickerViewModel;
-				sinkPickerLabel.Hidden = false;
 				sinkPicker.Hidden = false;
 
 				pickerViewModel.AccountPicked += (src, picked) =>
 				{
 					UIView.Animate(0.5, () => {
-						sinkPickerLabel.Frame = pickerLabelOffscreenLeft;
-						amountLabel.Frame = pickerLabelFrame;
-						sinkPicker.Frame = pickerFrameOffscreenLeft;
-						amountBox.Frame = amountBoxFrame;
-						transferButton.Frame = transferButtonFrame;
-						cancelButton.Frame = cancelButtonFrame;
+						pageView.Frame = new RectangleF(-UIScreen.MainScreen.Bounds.Width * 2, 0, UIScreen.MainScreen.Bounds.Width * 3, UIScreen.MainScreen.Bounds.Height);
 
 						SinkSelected(this, new TArgs<Account>(picked.Value));
 					});
 				};
 			};
 
-			//Make initial service request
-			model.ListTransferSources();
+		}
+
+
+		void LayoutSourceScreen(UIView pageView)
+		{
+			var transferLabel = new UILabel(new RectangleF(new PointF(10, 10), componentSize));
+			transferLabel.Font = UIFont.SystemFontOfSize(30);
+			transferLabel.Text = "Transfer Funds";
+
+			var pickerLabelFrame = new RectangleF(new PointF(10, compY), componentSize);
+			var sourcePickerLabel = new UILabel(pickerLabelFrame);
+			sourcePickerLabel.Font = UIFont.SystemFontOfSize(18);
+			sourcePickerLabel.Text = "Choose Source Account";
+//			sourcePickerLabel.Hidden = true;
+
+			var pickerFrame = new RectangleF(new PointF(10, 2 * compY), new SizeF(componentSize.Width, pickerHeight));
+			sourcePicker = new UIPickerView(pickerFrame);
+//			sourcePicker.Hidden = true;
+
+			pageView.Add(transferLabel);
+			pageView.Add(sourcePickerLabel);
+			pageView.Add(sourcePicker);
+		}
+
+		void LayoutSinkScreen(UIView pageView)
+		{
+			var sinkPickerLabelFrame = new RectangleF(new PointF(screenWidth + 10, 10), componentSize);
+			var sinkPickerLabel = new UILabel(sinkPickerLabelFrame);
+			sinkPickerLabel.Font = UIFont.SystemFontOfSize(18);
+			sinkPickerLabel.Text = "Choose Destination Account";
+
+			pageView.Add(sinkPickerLabel);
+
+			var sinkPickerFrame = new RectangleF(new PointF(screenWidth + 10, 2 * compY), new SizeF(componentSize.Width, pickerHeight));
+		 	sinkPicker = new UIPickerView(sinkPickerFrame);
+			pageView.Add(sinkPicker);
+		}
+
+		void LayoutAmountScreen(UIView pageView)
+		{
+			var amountLabelFrame = new RectangleF(new PointF(screenWidth * 2 + 10, 10), componentSize);
+			var amountLabel = new UILabel(amountLabelFrame);
+			amountLabel.Font = UIFont.SystemFontOfSize(18);
+			amountLabel.Text = "Enter amount to transfer";
+			pageView.Add(amountLabel);
+
+			var amountBoxFrame = new RectangleF(new PointF(screenWidth * 2 + 10, 2 * compY), componentSize);
+			amountBox = new UITextField(amountBoxFrame);
+			amountBox.BorderStyle = UITextBorderStyle.RoundedRect;
+			amountBox.Font = UIFont.SystemFontOfSize(15);
+			amountBox.Placeholder = "Enter amount to transfer";
+			amountBox.Text = "20";
+			amountBox.AutocorrectionType = UITextAutocorrectionType.No;
+			amountBox.KeyboardType = UIKeyboardType.DecimalPad;
+			amountBox.ReturnKeyType = UIReturnKeyType.Done;
+			amountBox.ClearButtonMode = UITextFieldViewMode.WhileEditing;
+			amountBox.VerticalAlignment = UIControlContentVerticalAlignment.Center;
+
+			var transferButtonFrame = new RectangleF(new PointF(screenWidth * 2 + 10, 3 * compY), componentSize);
+			transferButton = UIButton.FromType(UIButtonType.RoundedRect);
+			transferButton.Frame = transferButtonFrame;
+			transferButton.SetTitle("Transfer", UIControlState.Normal);
+
+
+			var cancelButtonFrame = new RectangleF(new PointF(screenWidth * 2 + 10, 4 * compY), componentSize);
+			cancelButton = UIButton.FromType(UIButtonType.RoundedRect);
+			cancelButton.Frame = cancelButtonFrame;
+			cancelButton.SetTitle("Cancel", UIControlState.Normal);
+
+			pageView.AddSubview(amountLabel);
+			pageView.AddSubview(amountBox);
+			pageView.AddSubview(transferButton);
+			pageView.AddSubview(cancelButton);
 		}
 
 		public event EventHandler TransferRequested = delegate {};

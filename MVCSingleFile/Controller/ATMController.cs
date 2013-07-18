@@ -20,7 +20,6 @@ namespace DCISingleFile
 			This UX is a stand-in for a real selection UX. Only "Transfer" works 
 			*/
 			var view = new ATMView();
-
 			view.TransferSelected += (s,e) => NavigationController.PushViewController(transferController, true);
 
 			View = view;
