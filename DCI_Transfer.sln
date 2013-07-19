@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCISingleFile", "MVCSingleFile\DCISingleFile.csproj", "{244B246F-5903-4739-AFDC-5FD2A6DFC36C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCI_Transfer", "MVCSingleFile\DCI_Transfer.csproj", "{244B246F-5903-4739-AFDC-5FD2A6DFC36C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +27,6 @@ Global
 		{244B246F-5903-4739-AFDC-5FD2A6DFC36C}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = MVCSingleFile\DCISingleFile.csproj
+		StartupItem = MVCSingleFile\DCI_Transfer.csproj
 	EndGlobalSection
 EndGlobal

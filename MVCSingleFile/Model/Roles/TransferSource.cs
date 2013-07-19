@@ -9,13 +9,6 @@ namespace DCISingleFile
 		Decimal Funds { get; }
 
 		void Withdraw(Decimal amount);
-
-		void FailTransfer(TransferFailedReason reason);
-
-		void AccomplishTransfer(TransferDetails details);
-
-//		event EventHandler<TArgs<TransferDetails>> TransferAccomplished;
-//		event EventHandler<TArgs<TransferFailedReason>> TransferFailed;
 	}
 }
 
