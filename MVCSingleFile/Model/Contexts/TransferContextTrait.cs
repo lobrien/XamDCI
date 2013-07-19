@@ -7,14 +7,13 @@ namespace DCISingleFile
 		/*
 	 * Note that according to DCI, transaction that undoubtedly wraps this is *outside* context 
 	 */
-		public static void TransferTo(this TransferSource self, TransferSink sink, Decimal amount)
+		public static TransferResult TransferTo(this TransferSource self, TransferSink sink, Decimal amount)
 		{
 			try
 			{
 				if(self.Funds < amount)
 				{
-					//Can't self.TransferFailed(self, reason) via extensions! 
-					self.FailTransfer(new TransferFailedReason("Insufficient Funds"));
+					return new TransferFailedReason("Insufficient funds");
 				}
 				else
 				{
@@ -22,12 +21,12 @@ namespace DCISingleFile
 					sink.Deposit(amount);
 
 					var details = new TransferDetails(self.Name, sink.Name, amount);
-					self.AccomplishTransfer(details);
+					return details;
 				}
 			}
 			catch(Exception x)
 			{
-				self.FailTransfer(new TransferFailedReason(x.ToString()));
+				return new TransferFailedReason(x.ToString());
 			}
 		}
 	}

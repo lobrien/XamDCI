@@ -94,6 +94,7 @@
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="Model\Readme.MD" />
+    <None Include="Readme.MD" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="Model\Classes\TransferFailedReason.cs" />
     <Compile Include="View\ATMView.cs" />
     <Compile Include="Controller\ATMController.cs" />
+    <Compile Include="Model\Classes\TransferResult.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

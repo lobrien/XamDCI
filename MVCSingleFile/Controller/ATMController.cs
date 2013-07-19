@@ -7,11 +7,15 @@ namespace DCISingleFile
 	{
 		BankMembership user;
 		TransferViewController transferController;
+		ATMView atmView;
 
 		public ATMController(BankMembership user)
 		{
 			this.user = user;
 			transferController = new TransferViewController(user);
+			atmView = new ATMView();
+
+			atmView.TransferSelected += (s,e) => NavigationController.PushViewController(transferController, true);
 		}
 
 		public override void ViewDidLoad()
@@ -19,10 +23,8 @@ namespace DCISingleFile
 			/*
 			This UX is a stand-in for a real selection UX. Only "Transfer" works 
 			*/
-			var view = new ATMView();
-			view.TransferSelected += (s,e) => NavigationController.PushViewController(transferController, true);
 
-			View = view;
+			View = atmView;
 		}
 	}
 }

@@ -6,6 +6,7 @@ namespace DCISingleFile
 {
 	public class TransferSpecificationView : UIView
 	{
+		UIView pageView;
 		UIButton transferButton;
 		UIButton cancelButton;
 		UIPickerView sourcePicker;
@@ -29,7 +30,8 @@ namespace DCISingleFile
 			compY = labelHeight + 20;
 			screenWidth = UIScreen.MainScreen.Bounds.Width;
 
-			var pageView = new UIView(new RectangleF(0, 0, UIScreen.MainScreen.Bounds.Width * 3, UIScreen.MainScreen.Bounds.Height));
+		 	pageView = new UIView();
+			ResetFrame();
 			Add(pageView);
 
 			LayoutSourceScreen(pageView);
@@ -39,6 +41,7 @@ namespace DCISingleFile
 			//Configure reaction to view events
 			transferButton.TouchUpInside += (s, e) => 
 			{
+				amountBox.ResignFirstResponder();
 				AmountSelected(this, new TArgs<Decimal>(Decimal.Parse(amountBox.Text)));
 				TransferRequested(this, new EventArgs());
 			};
@@ -122,25 +125,28 @@ namespace DCISingleFile
 			amountLabel.Text = "Enter amount to transfer";
 			pageView.Add(amountLabel);
 
-			var amountBoxFrame = new RectangleF(new PointF(screenWidth * 2 + 10, 2 * compY), componentSize);
+			var amountBoxFrame = new RectangleF(new PointF(screenWidth * 2 + 10, compY), componentSize);
 			amountBox = new UITextField(amountBoxFrame);
 			amountBox.BorderStyle = UITextBorderStyle.RoundedRect;
 			amountBox.Font = UIFont.SystemFontOfSize(15);
 			amountBox.Placeholder = "Enter amount to transfer";
 			amountBox.Text = "20";
 			amountBox.AutocorrectionType = UITextAutocorrectionType.No;
-			amountBox.KeyboardType = UIKeyboardType.DecimalPad;
-			amountBox.ReturnKeyType = UIReturnKeyType.Done;
+			amountBox.KeyboardType = UIKeyboardType.NumberPad;
+			amountBox.ReturnKeyType = UIReturnKeyType.Go;
 			amountBox.ClearButtonMode = UITextFieldViewMode.WhileEditing;
 			amountBox.VerticalAlignment = UIControlContentVerticalAlignment.Center;
+			amountBox.Delegate = new EndOnReturn();
+			amountBox.EnablesReturnKeyAutomatically = true;
+			amountBox.Ended += (s,e) => amountBox.ResignFirstResponder();
 
-			var transferButtonFrame = new RectangleF(new PointF(screenWidth * 2 + 10, 3 * compY), componentSize);
+			var transferButtonFrame = new RectangleF(new PointF(screenWidth * 2 + 10, 2 * compY), componentSize);
 			transferButton = UIButton.FromType(UIButtonType.RoundedRect);
 			transferButton.Frame = transferButtonFrame;
 			transferButton.SetTitle("Transfer", UIControlState.Normal);
 
 
-			var cancelButtonFrame = new RectangleF(new PointF(screenWidth * 2 + 10, 4 * compY), componentSize);
+			var cancelButtonFrame = new RectangleF(new PointF(screenWidth * 2 + 10, 3 * compY), componentSize);
 			cancelButton = UIButton.FromType(UIButtonType.RoundedRect);
 			cancelButton.Frame = cancelButtonFrame;
 			cancelButton.SetTitle("Cancel", UIControlState.Normal);
@@ -151,10 +157,24 @@ namespace DCISingleFile
 			pageView.AddSubview(cancelButton);
 		}
 
+		public void ResetFrame()
+		{
+			pageView.Frame = new RectangleF(0, 0, UIScreen.MainScreen.Bounds.Width * 3, UIScreen.MainScreen.Bounds.Height);
+		}
+
 		public event EventHandler TransferRequested = delegate {};
 		public event EventHandler<TArgs<Account>> SourceSelected = delegate {};
 		public event EventHandler<TArgs<Account>> SinkSelected = delegate {};
 		public event EventHandler<TArgs<Decimal>> AmountSelected = delegate {};
+	}
+
+	class EndOnReturn : UITextFieldDelegate
+	{
+		public override bool ShouldReturn(UITextField textField)
+		{
+			textField.ResignFirstResponder();
+			return true;
+		}
 	}
 }
 

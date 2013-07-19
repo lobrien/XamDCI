@@ -2,28 +2,9 @@ using System;
 
 namespace DCISingleFile
 {
-	class TransferContext
+	public class TransferContext
 	{
-		private TransferSource src;
-
-		public TransferSource Source
-		{
-			get
-			{
-				return src;
-			}
-			set
-			{
-				if(src != null)
-				{
-					src.TransferAccomplished -= this.OnSourceTransferAccomplished;
-					src.TransferFailed -= this.OnSourceTransferFailed;
-				}
-				src = value;
-				value.TransferAccomplished += this.OnSourceTransferAccomplished;
-				value.TransferFailed += this.OnSourceTransferFailed;
-			}
-		}
+		public TransferSource Source { get; protected set; }
 
 		public TransferSink Sink { get; protected set; }
 
@@ -36,36 +17,21 @@ namespace DCISingleFile
 			Amount = amount;
 		}
 
-		private void AssertNotNull(Object o)
-		{
-			if(o == null)
-			{
-				throw new NullReferenceException();
-			}
-		}
-
-		private void ValidatePreconditions()
-		{
-			AssertNotNull(Source);
-			AssertNotNull(Sink);
-			AssertNotNull(Amount);
-		}
-
 		public TransferContext Run()
 		{
-			ValidatePreconditions();
-			Source.TransferTo(Sink, Amount);
+			var result = Source.TransferTo(Sink, Amount);
+			result.Dispatch(this);
 			return this;
 		}
 
-		void OnSourceTransferAccomplished(Object src, TArgs<TransferDetails> details)
+		public void AccomplishTransfer(TransferDetails details)
 		{
-			TransferAccomplished(this, details);
+			TransferAccomplished(this, new TArgs<TransferDetails>(details));
 		}
 
-		void OnSourceTransferFailed(Object src, TArgs<TransferFailedReason> reason)
+		public void FailTransfer( TransferFailedReason reason)
 		{
-			TransferFailed(this, reason);
+			TransferFailed(this, new TArgs<TransferFailedReason>(reason));
 		}
 
 		public event EventHandler<TArgs<TransferDetails>> TransferAccomplished = delegate {};

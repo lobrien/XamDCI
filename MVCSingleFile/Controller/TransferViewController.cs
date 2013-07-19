@@ -8,6 +8,8 @@ namespace DCISingleFile
 	{
 		protected BankMembership Model { get; set; }
 
+		protected TransferSpecificationView transferView;
+
 		public TransferViewController(BankMembership model) : base ()
 		{
 			Model = model;
@@ -23,50 +25,56 @@ namespace DCISingleFile
 		{
 			base.ViewDidLoad();
 
-			var transferView = new TransferSpecificationView(UIScreen.MainScreen.Bounds, Model);
-			this.View = transferView;
-
-			//Establishing Objects for Context is Controller responsibility (note type is Object not Role!)
-			Account source = null;
-			Account sink = null;
-			Decimal? amount = null;
-			transferView.SourceSelected += (s,e) => source = e.Value;
-			transferView.SinkSelected += (s,e) => sink = e.Value;
-			transferView.AmountSelected += (s,e) => amount = e.Value;
-
-			//Initial Context is "Specify Transfer Context"
-			transferView.TransferRequested += (s,e) => 
+			if(transferView == null)
 			{
-				Validate(source != null);
-				Validate(sink != null);
-				Validate(amount.HasValue);
-				//Context binds roles atomically -- not piece-meal. Establishing these is Controller responsibility
-				var transferContext = new TransferContext(source as TransferSource, sink as TransferSink, amount.Value);
+				transferView = new TransferSpecificationView(UIScreen.MainScreen.Bounds, Model);
+				this.View = transferView;
 
-				//Configure post-Use-Case continuation:
-				transferContext.TransferAccomplished += (c,details) => 
+				//Establishing Objects for Context is Controller responsibility (note type is Object not Role!)
+				Account source = null;
+				Account sink = null;
+				Decimal? amount = null;
+				transferView.SourceSelected += (s,e) => source = e.Value;
+				transferView.SinkSelected += (s,e) => sink = e.Value;
+				transferView.AmountSelected += (s,e) => amount = e.Value;
+
+				//Initial Context is "Specify Transfer Context"
+				transferView.TransferRequested += (s,e) => 
 				{
-					NavigationController.PopToRootViewController(true);
-					new UIAlertView("Transferred", details.Value.Log, null, "OK", null).Show();
+					Validate(source != null);
+					Validate(sink != null);
+					Validate(amount.HasValue);
+					//Context binds roles atomically -- not piece-meal. Establishing these is Controller responsibility
+					var transferContext = new TransferContext(source as TransferSource, sink as TransferSink, amount.Value);
+
+					//Configure post-Use-Case continuation:
+					transferContext.TransferAccomplished += (c,details) => 
+					{
+						NavigationController.PopToRootViewController(true);
+						new UIAlertView("Transferred", details.Value.Log, null, "OK", null).Show();
+					};
+					transferContext.TransferFailed += (c,reason) => 
+					{
+						NavigationController.PopToRootViewController(true);
+						new UIAlertView("Failed", reason.Value.Reason, null, "OK", null).Show();
+					};
+
+					//Not shown: Wrap in transaction
+					transferContext.Run();
 				};
-				transferContext.TransferFailed += (c,reason) => 
-				{
-					NavigationController.PopToRootViewController(true);
-					new UIAlertView("Failed", reason.Value.Reason, null, "OK", null).Show();
-				};
-
-				//Not shown: Wrap in transaction
-				transferContext.Run();
-			};
-
-
+			}
 		}
 
 
+		public override void ViewDidDisappear(bool animated)
+		{
+			base.ViewDidDisappear(animated);
+		}
+
 		public override void ViewDidAppear(bool animated)
 		{
-			View.Frame = new RectangleF(0, 0, UIScreen.MainScreen.Bounds.Width * 3, UIScreen.MainScreen.Bounds.Height);
-			
+			transferView.ResetFrame();
+
 			//Make initial request
 			//Make initial service request
 			Model.ListTransferSources();

@@ -14,8 +14,8 @@ namespace DCISingleFile
 
 		void AccomplishTransfer(TransferDetails details);
 
-		event EventHandler<TArgs<TransferDetails>> TransferAccomplished;
-		event EventHandler<TArgs<TransferFailedReason>> TransferFailed;
+//		event EventHandler<TArgs<TransferDetails>> TransferAccomplished;
+//		event EventHandler<TArgs<TransferFailedReason>> TransferFailed;
 	}
 }
 
