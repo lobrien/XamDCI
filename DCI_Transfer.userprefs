@@ -10,15 +10,10 @@
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
-        <State expanded="True" selected="True">
-          <Node name="DCISingleFile" expanded="True">
+        <State expanded="True">
+          <Node name="DCI_Transfer" expanded="True">
             <Node name="Controller" expanded="True" />
-            <Node name="Model" expanded="True">
-              <Node name="Classes" expanded="True" />
-              <Node name="Contexts" expanded="True" />
-              <Node name="Data" expanded="True" />
-              <Node name="Roles" expanded="True" />
-            </Node>
+            <Node name="Model" expanded="True" />
           </Node>
         </State>
       </Pad>
